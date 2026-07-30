@@ -1,6 +1,20 @@
-from ingestion.web_loader import load_web
+from ingestion.loader import load_source
+from rag.chunk import chunk_documents
+from rag.vectorstore import add_documents, get_vectorstore
+from rag.retrieve import retrieve
+# load te document
+docs = load_source("https://en.wikipedia.org/wiki/AI_agent", "web")
+# chunk the document
+chunks=chunk_documents(docs)
+# add the chunks to the vectorstore
+add_documents(chunks)
+# Open the vectorstore and count the number of chunks
+store = get_vectorstore()
 
-docs = load_web("https://en.wikipedia.org/wiki/Strawberry")
 print("documents loaded:", len(docs))
-print("metadata:", docs[0].metadata)
-print("first 200 chars:", docs[0].page_content[:200])
+print("total chunks in store:", store._collection.count())
+
+print("\n--- search: 'what is an AI agent' ---")
+results = retrieve("what is an AI agent", k=4)
+for d in results:
+    print(f"[source {d.metadata.get('source')}] {d.page_content}")

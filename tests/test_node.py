@@ -4,7 +4,7 @@ from langchain_core.messages import HumanMessage
 
 from agents.nodes import tutor_node, quiz_node, research_node
 cases=[
-    (tutor_node,"Explain chunking to me like I'm a beginner."),
+    (tutor_node,"hello"),
     (quiz_node,"greetings in korean."),
     (research_node, "What does my material say about embeddings?"),
 ] 
