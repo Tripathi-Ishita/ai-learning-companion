@@ -1,6 +1,7 @@
 venv/
 .env
 data/chroma_db/
+data/profiles.json
 __pycache__/
 *.pyc
 .DS_Store
