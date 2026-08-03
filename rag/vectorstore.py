@@ -15,7 +15,8 @@ def get_vectorstore() -> Chroma:
 
 
 def add_documents(chunks: list[Document]) -> None:
-    """Embed chunks and save them into the persistent store."""
+    """Embed chunks and save them. Deterministic ids make re-ingestion an upsert."""
     store = get_vectorstore()
-    store.add_documents(chunks)               # embeds each chunk, writes to disk
+    ids = [f"{c.metadata.get('source', 'unknown')}::{i}" for i, c in enumerate(chunks)]
+    store.add_documents(chunks, ids=ids)
     print(f"added {len(chunks)} chunks to {PERSIST_DIR}")

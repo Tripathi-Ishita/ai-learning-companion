@@ -5,3 +5,4 @@ mark_seen("ishita", "attention")
 mark_weak("ishita", "graphrag")
 print(load_profile("ishita"))   # predict this
 print(load_profile("nobody"))   # predict this
+

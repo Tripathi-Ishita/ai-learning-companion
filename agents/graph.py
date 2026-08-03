@@ -8,10 +8,11 @@ Shape:
 The router is a WORKFLOW: a human-written rule picks the lane.
 The tool loop is an AGENT: the model itself decides whether to search again.
 """
-
+import os
+import sqlite3
+from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
-from langgraph.checkpoint.memory import MemorySaver
 
 from state import LearningState
 from agents.tools import tools
@@ -76,6 +77,8 @@ workflow.add_conditional_edges(
     {"tutor": "tutor", "quiz": "quiz", "research": "research"},
 )
 
-checkpointer = MemorySaver()
+os.makedirs("data", exist_ok=True)
+conn = sqlite3.connect("data/checkpoints.sqlite", check_same_thread=False)
+checkpointer = SqliteSaver(conn)
 
 app = workflow.compile(checkpointer=checkpointer)

@@ -5,3 +5,4 @@ data/profiles.json
 __pycache__/
 *.pyc
 .DS_Store
+data/checkpoints.sqlite
