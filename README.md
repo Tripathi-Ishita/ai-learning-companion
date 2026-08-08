@@ -87,47 +87,7 @@ Open http://localhost:8501, add a source from the sidebar, and ask a question. T
 
 ---
 
-## Design decisions worth defending
 
-**The chunks panel shows what the agent saw, not a fresh retrieval.** `/ask` extracts the `ToolMessage`s from the current turn rather than re-running `retrieve(question)`. The agent rewrites the user's question into its own search query, so re-retrieving on the raw question would display chunks the model never read. Honesty over convenience — with the accepted cost that formatted tool output carries no similarity scores.
-
-**Deterministic chunk ids.** Every chunk is stored as `{source}::{index}`, so re-ingesting a source is an upsert, not a duplicate insert. Verified: adding the same URL twice leaves the store unchanged.
-
-**The router's fallback is always a grounded lane.** Unvalidated model output never becomes control flow: the router's reply is checked against `{tutor, quiz, research}` with a hard fallback to `tutor`. A proposed ungrounded "chat" lane was rejected — routing errors into it would silently turn a grounded system into a generic chatbot.
-
-**Never ask the model a fact you can compute.** Anything about the shape of its own input — is there prior history, which message is newest — is computed in Python and stated in the prompt as fact. A rule asking the model to introspect its own context window failed in both directions before being replaced with `has_prior_answer` computed in code.
-
-**Heavy objects load once at startup.** The embedding model and compiled graph are built at import time, never per request.
-
----
-
-## Known limitations (measured, not guessed)
-
-These were found by testing the running system, and are documented deliberately — identifying weaknesses is the point of measuring.
-
-**Tool use is non-deterministic.** The tutor *may* answer easy general-knowledge questions from the model's own training instead of searching — observed live: the same question retrieved chunks on one run and skipped retrieval on another. Mitigation: the research lane must cite, so an uncited claim signals a training leak. Roadmap: enforce a tool call before answering.
-
-**Web boilerplate occupies retrieval slots.** Wikipedia's page footer ("Retrieved from …oldid=…") was returned as a top-k chunk. Fix is reranking plus ingestion cleaning (roadmap).
-
-**Retrieval underperforms on list-structured documents.** With a phrase-list PDF, chunks share near-identical structure, so the embedder scores sentence *shape* over answer *content*. Prose sources retrieve well. Planned fix: hybrid BM25 + vector search with cross-encoder reranking.
-
-**Quiz coverage equals one retrieval.** A quiz is built from ~4 chunks similar to a single model-written query — "quiz me on attention" works; "quiz me on my documents" produces an arbitrary quiz. The fix is broad-corpus quiz retrieval — different retrieval, not a different prompt.
-
-**Follow-ups reuse conversation instead of re-searching.** Once material is in the message history, later turns often answer from it with no new retrieval — which also means later turns are less grounded than the first.
-
-**No per-user document isolation.** Conversations are isolated per user (`thread_id = user_id`), but the vector store is a shared pool: chunk metadata carries `source` and `type` only. Fixing this is non-trivial because the LLM writes the tool call and has no access to user identity — it requires injected state or per-request tool construction.
-
-**UI display state is session-scoped.** A browser refresh clears the visible chat, source list, and counters; the underlying data survives in Chroma and SQLite. Rehydration on load is the first roadmap item.
-
-**No authentication.** User identity is a plain text input, sufficient to demonstrate per-user conversation isolation.
-
----
-
-## Roadmap (v2)
-
-In order: a login page for identity capture → rehydrating the UI from the durable stores on login (sources, counts, and prior chat) → multi-chat per user (`thread_id = user_id::chat_id`) → per-user document isolation in Chroma → quiz configuration (question count, difficulty) scoped to the profile store's `topics_seen` → broad-coverage quiz retrieval → similarity scores in the chunks panel → hybrid search + reranking → knowledge graph + GraphRAG (Neo4j) → an evaluation harness.
-
----
 
 ## Project structure
 
