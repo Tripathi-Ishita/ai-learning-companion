@@ -1,7 +1,7 @@
 # Studybook — AI Research & Learning Companion
 
 **Live demo:** https://studybook-ai.streamlit.app  
-*(Free hosting: if nobody has opened it for 12 hours it sleeps — click "Yes, get this app back up!" and give it about a minute.)*
+*(Free hosting: if nobody has opened it for 12 hours it sleeps — click "Yes, get this app back up!" and give it about a minute. On the demo, uploaded documents and chat history reset whenever it sleeps or restarts; run it locally to keep them.)*
 
 Ask questions against your own material. Upload PDFs, notes, web articles, or YouTube transcripts, then talk to them: get beginner-friendly explanations, generated quizzes, or cited factual answers — grounded in *your* documents, not the model's memory, and remembered across sessions.
 
@@ -56,7 +56,7 @@ Dependency direction is strictly one-way: `ui → api → agents → rag → ing
 | SQLite (`data/checkpoints.sqlite`) | full conversation state snapshots | `thread_id` = `user_id` |
 | `data/profiles.json` | per-user topic progress | `user_id` |
 
-Conversation memory and user memory are deliberately separate: the checkpointer answers "what did we just say?", the profile store answers "what does this person know?". The profile store is scaffolded and tested but not yet wired to a grader — automatic topic-tagging is deferred (see roadmap).
+Conversation memory and user memory are deliberately separate: the checkpointer answers "what did we just say?", the profile store answers "what does this person know?". The profile store is scaffolded and tested but not yet wired to a grader — automatic topic-tagging is not built yet.
 
 ---
 
@@ -68,13 +68,18 @@ Python · LangGraph · LangChain · Chroma · sentence-transformers model `parap
 
 ## Running it locally
 
+Needs Python 3.11+ (the live demo runs 3.12) and a free Groq API key from console.groq.com.
+
 ```bash
-git clone <this repo>
+git clone https://github.com/Tripathi-Ishita/ai-learning-companion.git
 cd ai-learning-companion
-python -m venv venv && venv\Scripts\activate        # Windows
+python -m venv venv
+venv\Scripts\activate                # Windows   (macOS/Linux: source venv/bin/activate)
 pip install -r requirements.txt
-copy .env.example .env                               # add your GROQ_API_KEY
+copy .env.example .env              # Windows   (macOS/Linux: cp .env.example .env)
 ```
+
+Then open `.env` and put your key after `GROQ_API_KEY=`. The first run downloads the embedding model (about 0.2 GB), so it takes a minute.
 
 Two terminals:
 
@@ -96,11 +101,10 @@ Open http://localhost:8501, add a source from the sidebar, and ask a question. T
 
 ---
 
-
-
 ## Project structure
 
 ```
+streamlit_app.py     entry point for the live demo: starts the API in a background thread, then the UI
 config.py            env, constants, shared llm + embeddings
 state.py             LearningState TypedDict
 ingestion/           pdf / web / youtube / notes loaders + dispatcher
