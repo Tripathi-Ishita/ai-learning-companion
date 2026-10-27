@@ -1,6 +1,6 @@
 # Studybook — AI Research & Learning Companion
 
-**Live demo:** https://studybook.streamlit.app  
+**Live demo:** https://studybook-ai.streamlit.app  
 *(Free hosting: if nobody has opened it for 12 hours it sleeps — click "Yes, get this app back up!" and give it about a minute.)*
 
 Ask questions against your own material. Upload PDFs, notes, web articles, or YouTube transcripts, then talk to them: get beginner-friendly explanations, generated quizzes, or cited factual answers — grounded in *your* documents, not the model's memory, and remembered across sessions.
