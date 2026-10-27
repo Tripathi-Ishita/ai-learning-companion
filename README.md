@@ -31,7 +31,7 @@ Conversations are remembered per user across sessions and across server restarts
 
 ## Architecture
 
-Two separate processes, talking only over HTTP:
+Two separate processes, talking only over HTTP. Locally you can run them in two terminals; in the live deployment, `streamlit_app.py` starts the FastAPI backend in a background thread inside the same container, because free hosting runs a single process:
 
 ```
 Browser
