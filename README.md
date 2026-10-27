@@ -1,5 +1,8 @@
 # Studybook — AI Research & Learning Companion
 
+**Live demo:** https://studybook.streamlit.app  
+*(Free hosting: if nobody has opened it for 12 hours it sleeps — click "Yes, get this app back up!" and give it about a minute.)*
+
 Ask questions against your own material. Upload PDFs, notes, web articles, or YouTube transcripts, then talk to them: get beginner-friendly explanations, generated quizzes, or cited factual answers — grounded in *your* documents, not the model's memory, and remembered across sessions.
 
 Built as a portfolio project to cover the GenAI stack end to end: RAG, multi-agent orchestration with LangGraph, persistent conversation memory, a FastAPI backend, and a Streamlit frontend.
@@ -38,7 +41,7 @@ Browser
                     └── LangGraph   router → { tutor | quiz | research } → (tools → back)* → END
                           ├── Chroma          persistent vector store (retrieval seam: rag/retrieve.py)
                           ├── SqliteSaver     conversation checkpoints, keyed by thread_id = user_id
-                          └── Groq LLM        llama-3.1-8b-instant
+                          └── Groq LLM        openai/gpt-oss-20b
 ```
 
 Dependency direction is strictly one-way: `ui → api → agents → rag → ingestion → config`. The UI imports only `requests` and `streamlit` — it could be replaced with React tomorrow and no AI code would change.
@@ -59,7 +62,7 @@ Conversation memory and user memory are deliberately separate: the checkpointer 
 
 ## Stack
 
-Python · LangGraph · LangChain · Chroma · sentence-transformers (`paraphrase-multilingual-MiniLM-L12-v2`) · Groq (`llama-3.1-8b-instant`) · FastAPI + uvicorn · Streamlit
+Python · LangGraph · LangChain · Chroma · sentence-transformers model `paraphrase-multilingual-MiniLM-L12-v2` (run via fastembed/ONNX) · Groq (`openai/gpt-oss-20b`) · FastAPI + uvicorn · Streamlit
 
 ---
 
@@ -81,6 +84,12 @@ uvicorn api.main:api --reload
 
 # 2 — the UI
 streamlit run ui/app.py
+```
+
+Or, one command that starts both (this is what the live deployment runs):
+
+```bash
+streamlit run streamlit_app.py
 ```
 
 Open http://localhost:8501, add a source from the sidebar, and ask a question. The API also exposes interactive docs at http://localhost:8000/docs.
