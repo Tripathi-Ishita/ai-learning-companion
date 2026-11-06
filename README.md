@@ -5,7 +5,6 @@
 
 Ask questions against your own material. Upload PDFs, notes, web articles, or YouTube transcripts, then talk to them: get beginner-friendly explanations, generated quizzes, or cited factual answers — grounded in *your* documents, not the model's memory, and remembered across sessions.
 
-Built as a portfolio project to cover the GenAI stack end to end: RAG, multi-agent orchestration with LangGraph, persistent conversation memory, a FastAPI backend, and a Streamlit frontend.
 
 <!-- SCREENSHOT 1: loaded conversation, dark theme, TUTOR answer with Retrieved chunks expanded -->
 ![Studybook — conversation with retrieved chunks](docs/screenshot-conversation.png)
@@ -44,7 +43,7 @@ Browser
                           └── Groq LLM        openai/gpt-oss-20b
 ```
 
-Dependency direction is strictly one-way: `ui → api → agents → rag → ingestion → config`. The UI imports only `requests` and `streamlit` — it could be replaced with React tomorrow and no AI code would change.
+Dependency direction is strictly one-way: `ui → api → agents → rag → ingestion → config`. The UI imports only `requests` and `streamlit` — it could be replaced with React later and no AI code would change.
 
 **Two mechanisms in one graph.** The intent router is a *workflow*: a human-written rule reads the classified intent and picks the lane. The tool loop is an *agent*: the model itself decides whether to call `search_documents` (and writes its own search query — "explain chunking like I'm a beginner" becomes `query="chunking definition"`). A hard `step_count` ceiling, reset per turn by the router, guarantees the loop terminates regardless of what the model does.
 
@@ -55,8 +54,6 @@ Dependency direction is strictly one-way: `ui → api → agents → rag → ing
 | Chroma (`data/chroma_db`) | document chunks + embeddings | — (shared pool) |
 | SQLite (`data/checkpoints.sqlite`) | full conversation state snapshots | `thread_id` = `user_id` |
 | `data/profiles.json` | per-user topic progress | `user_id` |
-
-Conversation memory and user memory are deliberately separate: the checkpointer answers "what did we just say?", the profile store answers "what does this person know?". The profile store is scaffolded and tested but not yet wired to a grader — automatic topic-tagging is not built yet.
 
 ---
 
