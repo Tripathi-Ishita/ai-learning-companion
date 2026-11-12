@@ -47,13 +47,14 @@ Dependency direction is strictly one-way: `ui → api → agents → rag → ing
 
 **Two mechanisms in one graph.** The intent router is a *workflow*: a human-written rule reads the classified intent and picks the lane. The tool loop is an *agent*: the model itself decides whether to call `search_documents` (and writes its own search query — "explain chunking like I'm a beginner" becomes `query="chunking definition"`). A hard `step_count` ceiling, reset per turn by the router, guarantees the loop terminates regardless of what the model does.
 
-**Three separate stores, three separate jobs.**
+**Two separate stores, two separate jobs.**
 
 | Store | Holds | Keyed by |
 |---|---|---|
 | Chroma (`data/chroma_db`) | document chunks + embeddings | — (shared pool) |
 | SQLite (`data/checkpoints.sqlite`) | full conversation state snapshots | `thread_id` = `user_id` |
-| `data/profiles.json` | per-user topic progress | `user_id` |
+
+A third store for per-user topic progress (`data/profiles.json`, read by `/profile/{user_id}`) is set up in the code, but nothing writes to it yet.
 
 ---
 
@@ -106,7 +107,7 @@ config.py            env, constants, shared llm + embeddings
 state.py             LearningState TypedDict
 ingestion/           pdf / web / youtube / notes loaders + dispatcher
 rag/                 chunking, vector store, retrieval seam, RAG chain
-agents/              tools, nodes (router + 3 specialists), graph, profile store
+agents/              tools, nodes (router + 3 specialists), graph, profile store (not wired up yet)
 api/main.py          FastAPI: /upload, /ask, /profile/{user_id}
 ui/app.py            Streamlit frontend (HTTP only)
 tests/               run as: python -m tests.<name>
