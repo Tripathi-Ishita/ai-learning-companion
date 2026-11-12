@@ -54,8 +54,6 @@ Dependency direction is strictly one-way: `ui → api → agents → rag → ing
 | Chroma (`data/chroma_db`) | document chunks + embeddings | — (shared pool) |
 | SQLite (`data/checkpoints.sqlite`) | full conversation state snapshots | `thread_id` = `user_id` |
 
-A third store for per-user topic progress (`data/profiles.json`, read by `/profile/{user_id}`) is set up in the code, but nothing writes to it yet.
-
 ---
 
 ## Stack
@@ -107,7 +105,7 @@ config.py            env, constants, shared llm + embeddings
 state.py             LearningState TypedDict
 ingestion/           pdf / web / youtube / notes loaders + dispatcher
 rag/                 chunking, vector store, retrieval seam, RAG chain
-agents/              tools, nodes (router + 3 specialists), graph, profile store (not wired up yet)
+agents/              tools, nodes (router + 3 specialists), graph, profile store
 api/main.py          FastAPI: /upload, /ask, /profile/{user_id}
 ui/app.py            Streamlit frontend (HTTP only)
 tests/               run as: python -m tests.<name>
