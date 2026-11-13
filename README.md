@@ -3,7 +3,7 @@
 **Live demo:** https://studybook-ai.streamlit.app  
 *(Free hosting: if nobody has opened it for 12 hours it sleeps — click "Yes, get this app back up!" and give it about a minute. On the demo, uploaded documents and chat history reset whenever it sleeps or restarts; run it locally to keep them.)*
 
-Ask questions against your own material. Upload PDFs, notes, web articles, or YouTube transcripts, then talk to them: get beginner-friendly explanations, generated quizzes, or cited factual answers — grounded in *your* documents, not the model's memory, and remembered across sessions.
+Ask questions against your own material. Upload PDFs, notes, web articles, or YouTube transcripts, then talk to them: get beginner-friendly explanations, generated quizzes, or cited factual answers — answered from your documents through retrieval, and remembered across sessions.
 
 
 <!-- SCREENSHOT 1: loaded conversation, dark theme, TUTOR answer with Retrieved chunks expanded -->
@@ -17,7 +17,7 @@ You add sources from the sidebar — drag-and-drop a PDF or TXT, or paste a web 
 
 - **TUTOR** — beginner-friendly explanation, analogy first, plain prose
 - **QUIZ** — multiple-choice questions generated from retrieved material
-- **RESEARCH** — factual answers with explicit citations (`[from source, page N]`)
+- **RESEARCH** — factual answers with source citations (`[from source, page N]`)
 
 Every answer carries an uppercase label showing which specialist produced it, and a collapsible **Retrieved chunks** panel showing exactly what the agent read before answering — the actual tool output from that turn, not a re-run of retrieval.
 
@@ -36,7 +36,7 @@ Two separate processes, talking only over HTTP. Locally you can run them in two 
 Browser
   └── Streamlit UI (:8501)          ui/app.py — imports nothing from the project
         └── HTTP / JSON
-              └── FastAPI (:8000)   api/main.py — /upload, /ask, /profile/{user_id}
+              └── FastAPI (:8000)   api/main.py — /upload, /ask}
                     └── LangGraph   router → { tutor | quiz | research } → (tools → back)* → END
                           ├── Chroma          persistent vector store (retrieval seam: rag/retrieve.py)
                           ├── SqliteSaver     conversation checkpoints, keyed by thread_id = user_id
